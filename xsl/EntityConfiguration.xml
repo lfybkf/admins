@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ROOT> 
+<Schema Name="configuration" />
+
+<Entity Table="casino_accounts" Name="casino_account" Class="CasinoAccount">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="name" Type="varchar(255)" Unique="1" scWidth="*"/>
+	<F Name="integration_code" Type="varchar(255)" Unique="1" Descr="Unique code for template" scWidth="*"/>
+	<F Name="component_code" Type="varchar(45)" Descr="Code of component" scWidth="*"/>
+	<F Name="status" Type="char(1)"/>
+	<F Name="is_valid" Type="boolean" Def="true" scWidth="*"/>
+	<F Name="is_active" Type="boolean" Def="true" scWidth="*"/>
+	<F Name="create_date" Type="timestamp with time zone" scDef="new Date()" scRO="1"/>
+	<F Name="provider_id" Type="integer" scWidth="*"/>
+	<Link Name="all" Master="">
+		<List Way="All" OrderBy="name" />
+	</Link>
+	<Link Name="provider" Master="Provider">
+		<List Way="SimpleMaster" MasterField="provider_id.id" OrderBy="name" />
+	</Link>
+
+</Entity>
+
+<Entity Table="bet_types" Name="bet_type" Class="BetType">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="code" Type="varchar(45)" Uniq1="CODE" scWidth="*"/>
+	<F Name="name" Type="text" scWidth="*"/>
+	<F Name="client_code" Type="integer" Uniq2="CLCODE" Descr="Code sent to client" scWidth="*"/>
+	<F Name="casino_account_id" Type="integer" Uniq1="CODE" Uniq2="CLCODE" RefTable="game_accounts" scWidth="*"/>
+	<Link Name="casino_account" Master="CasinoAccount">
+		<List Way="SimpleMaster" MasterField="casino_account_id.id" OrderBy="code" />
+	</Link>
+</Entity>
+
+<Entity Table="event_types" Name="event_type" Class="EventType">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="code" Type="varchar(45)" Uniq1="CODE" scWidth="*"/>
+	<F Name="casino_account_id" Type="integer" Uniq1="CODE" scWidth="*"/>
+	<Link Name="casino_account" Master="CasinoAccount">
+		<List Way="SimpleMaster" MasterField="casino_account_id.id" OrderBy="code" />
+	</Link>
+</Entity>
+
+<Entity Table="currency_params" Name="currency_param" Class="CurrencyParam">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="code" Type="varchar(45)" Uniq1="1" scWidth="*"/>
+	<F Name="currency_code" Type="varchar(3)" Uniq1="1" scWidth="*"/>
+	<F Name="value" Type="text" scWidth="*"/>
+	<F Name="casino_account_id" Type="integer" Uniq1="1" scWidth="*"/>
+	<Link Name="casino_account" Master="CasinoAccount">
+		<List Way="SimpleMaster" MasterField="casino_account_id.id" OrderBy="code, currency_code" />
+	</Link>
+	<Link Name="same_code" Master="CurrencyParam" Label="same code">
+		<List Way="Sql">FROM configuration.currency_params z WHERE code = (SELECT code FROM configuration.currency_params WHERE currency_param_id = :master_id)</List>
+	</Link>
+</Entity>
+
+<Entity Table="lang_params" Name="lang_param" Class="LangParam">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="code" Type="varchar(45)" Uniq1="1" scWidth="*"/>
+	<F Name="lang" Type="varchar(2)" Uniq1="1" scWidth="*"/>
+	<F Name="value" Type="text" scWidth="*"/>
+	<F Name="casino_account_id" Type="integer" Uniq1="1" scWidth="*"/>
+	<Link Name="casino_account" Master="CasinoAccount">
+		<List Way="SimpleMaster" MasterField="casino_account_id.id" OrderBy="code, lang" />
+	</Link>
+</Entity>
+
+<Entity Table="params" Name="param" Class="Param">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="code" Type="varchar(45)" Uniq1="1" scWidth="*"/>
+	<F Name="value" Type="text" scWidth="*"/>
+	<F Name="casino_account_id" Type="integer" Uniq1="1" scWidth="*"/>
+	<Link Name="casino_account" Master="CasinoAccount">
+		<List Way="SimpleMaster" MasterField="casino_account_id.id" OrderBy="code" />
+	</Link>
+</Entity>
+
+<Entity Table="game_accounts">
+	<F Name="casino_account_id" Type="integer" PK="1" />
+</Entity>
+
+<Entity Table="providers" Name="provider" Class="Provider">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="name" Type="varchar(255)" scWidth="*"/>
+	<F Name="code" Type="varchar(45)" Unique="1" scWidth="*"/>
+	<Link Name="all" Master="">
+		<List Way="All" OrderBy="name" />
+	</Link>
+</Entity>
+
+<Entity Table="servers" Name="server" Class="Server">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="name" Type="text" scWidth="*"/>
+	<F Name="code" Type="varchar(45)" Unique="1" scWidth="*"/>
+	<F Name="address" Type="text" scWidth="*"/>
+	<Link Name="all" Master="">
+		<List Way="All" OrderBy="name" />
+	</Link>
+	<Link Name="whl_account" Master="WhlAccount">
+		<List Way="Sql">FROM configuration.servers z JOIN configuration.server_whl_accounts sw ON sw.server_id = z.server_id WHERE sw.whl_account_id = :master_id ORDER BY z.name</List>
+	</Link>
+
+</Entity>
+
+<Entity Table="server_whl_accounts" >
+	<F Name="server_id" Type="integer" PK="1" />
+	<F Name="whl_account_id" Type="integer" />
+</Entity>
+
+<Entity Table="whl_accounts" Name="whl_account" Class="WhlAccount">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="name" Type="varchar(255)" scWidth="*"/>
+	<F Name="integration_code" Type="text" Uniq1="1" Descr="code for game" scWidth="*"/>
+	<F Name="status" Type="char(1)"/>
+	<F Name="url" Type="text"/>
+	<F Name="description" Type="text"/>
+	<F Name="is_valid" Type="boolean" Def="true" scWidth="*"/>
+	<F Name="is_active" Type="boolean" Def="true" scWidth="*"/>
+	<F Name="create_date" Type="timestamp with time zone" scRO="1"/>
+	<F Name="whl_id" Type="integer" Uniq1="1" scWidth="*"/>
+	<F Name="casino_account_id" Type="integer" scWidth="*"/>
+	<Link Name="all" Master="">
+		<List Way="All" OrderBy="name" />
+	</Link>
+	<Link Name="casino_account" Master="CasinoAccount" Label="samples of">
+		<List Way="SimpleMaster" MasterField="casino_account_id.id" OrderBy="name" />
+	</Link>
+	<Link Name="whl" Master="WhiteLabel" Label="registered here">
+		<List Way="SimpleMaster" MasterField="whl_id.id" OrderBy="name" />
+	</Link>
+	<Link Name="server" Master="Server" Label="on this server">
+		<List Way="Sql">FROM configuration.whl_accounts z JOIN configuration.server_whl_accounts sw ON sw.whl_account_id = z.whl_account_id WHERE sw.server_id = :master_id ORDER BY z.name</List>
+	</Link>
+	<Link Name="whl_category" Master="WhlCategory">
+		<List Way="Sql">FROM configuration.whl_accounts z JOIN configuration.whl_category_game ln ON ln.whl_account_id = z.whl_account_id WHERE ln.whl_category_id = :master_id ORDER BY z.name</List>
+	</Link>
+</Entity>
+
+<Entity Table="whl_account_groups" >
+	<F Name="whl_account_id" Type="integer" PK="1" />
+	<F Name="user_group_id" Type="integer" PK="1" />
+</Entity>
+
+<Entity Table="whl_account_currency_params" Name="whl_account_currency_param" Class="WhlAccountCurrencyParam">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="code" Type="varchar(45)" Uniq1="1" scWidth="*"/>
+	<F Name="currency_code" Type="varchar(3)" Uniq1="1" scWidth="*"/>
+	<F Name="value" Type="text" scWidth="*"/>
+	<F Name="whl_account_id" Type="integer" Uniq1="1" scWidth="*"/>
+	<F Name="user_group_id" Type="integer" Uniq1="1" scWidth="*" />
+	<Link Name="whl_account" Master="WhlAccount">
+		<List Way="SimpleMaster" MasterField="whl_account_id.id" OrderBy="code, currency_code" />
+	</Link>
+	<Link Name="user_group" Master="UserGroup">
+		<List Way="SimpleMaster" MasterField="user_group_id.id" OrderBy="code, currency_code" />
+	</Link>
+	<Link Name="same_code" Master="CurrencyParam" Label="same code">
+		<List Way="Sql" >FROM configuration.whl_account_currency_params z WHERE code = (SELECT code FROM configuration.currency_params WHERE currency_param_id = :master_id) ORDER BY z.code, z.currency_code</List>
+	</Link>
+</Entity>
+
+<Entity Table="whl_account_lang_params" Name="whl_account_lang_param" Class="WhlAccountLangParam">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="code" Type="varchar(45)" Uniq1="1" scWidth="*" />
+	<F Name="lang" Type="varchar(2)" Uniq1="1" scWidth="*" />
+	<F Name="value" Type="text" scWidth="*" />
+	<F Name="whl_account_id" Type="integer" Uniq1="1" scWidth="*" />
+	<Link Name="whl_account" Master="WhlAccount">
+		<List Way="SimpleMaster" MasterField="whl_account_id.id" OrderBy="code, lang" />
+	</Link>
+</Entity>
+
+<Entity Table="whl_account_params" Name="whl_account_param" Class="WhlAccountParam">
+	<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+	<F Name="code" Type="varchar(45)" Uniq1="1" scWidth="*"/>
+	<F Name="value" Type="text" scWidth="*"/>
+	<F Name="whl_account_id" Type="integer" Uniq1="1" scWidth="*"/>
+
+	<Link Name="whl_account" Master="WhlAccount">
+		<List Way="SimpleMaster" MasterField="whl_account_id.id" OrderBy="code" />
+	</Link>
+</Entity>
+
+
+	<Entity Table="whitelabels" Name="whl" Class="WhiteLabel">
+		<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+		<F Name="name" Type="text" scWidth="*"/>
+		<F Name="code" Type="text" scWidth="*"/>
+		<F Name="is_blocked" Type="boolean" Def="true" scWidth="5%"/>
+
+		<Link Name="all" Master="" >
+			<List Way="All" OrderBy="name" />
+		</Link>
+
+		<Link Name="auth_type" Master="AuthType">
+			<List Way="Sql">FROM configuration.whitelabels z JOIN configuration.whl_auth_types sw ON sw.whl_id = z.whl_id WHERE sw.auth_type_id = :master_id ORDER BY z.name</List>
+		</Link>
+	</Entity>
+
+	<Entity Table="whl_currencies" Name="whl_currency" Class="WhlCurrency">
+		<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+		<F Name="currency_code" Type="varchar(3)" Uniq1="1" scWidth="*"/>
+		<F Name="whl_id" Type="integer" Uniq1="1" scWidth="*"/>
+		<Link Name="whl" Master="WhiteLabel">
+			<List Way="SimpleMaster" MasterField="whl_id.id" OrderBy="currency_code" />
+		</Link>
+	</Entity>
+
+	<Entity Table="user_groups" Name="user_group" Class="UserGroup">
+		<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+		<F Name="name" Type="text" scWidth="*"/>
+		<F Name="code" Type="text" scWidth="15%"/>
+		<F Name="whl_id" Type="integer" scWidth="15%"/>
+
+		<Link Name="whl" Master="WhiteLabel">
+			<List Way="SimpleMaster" MasterField="whl_id.id" OrderBy="name" />
+		</Link>
+		<Link Name="whl_account" Master="WhlAccount">
+			<List Way="Sql">FROM configuration.user_groups z JOIN configuration.whl_account_groups ln ON ln.user_group_id = z.user_group_id WHERE ln.whl_account_id = :master_id ORDER BY z.name </List>
+		</Link>
+	</Entity>
+
+	<Entity Name="wallet_type" Table="wallet_types" Class="WalletType">
+		<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+		<F Name="name" Type="varchar(255)" scWidth="*"/>
+		<F Name="code" Type="varchar(45)" Unique="1" scWidth="*"/>
+
+		<Link Name="all" Master="">
+			<List Way="All" OrderBy="name" />
+		</Link>
+
+	</Entity>
+
+	<Entity Name="whl_wallet_type" Table="whl_wallet_types" Class="WhlWalletType">
+		<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+		<F Name="wallet_type_id" Type="integer" scWidth="*"/>
+		<F Name="whl_id" Type="integer" scWidth="*"/>
+
+		<Link Name="whl" Master="WhiteLabel">
+			<List Way="SimpleMaster" MasterField="whl_id.id" OrderBy="whl_id" />
+		</Link>
+		<Link Name="wallet_type" Master="WalletType">
+			<List Way="SimpleMaster" MasterField="wallet_type_id.id" OrderBy="whl_id" />
+		</Link>
+
+	</Entity>
+
+	<Entity Name="whl_wallet_type_param" Table="whl_wallet_type_params" Class="WhlWalletTypeParam">
+		<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+		<F Name="code" Type="text" scWidth="*"/>
+		<F Name="value" Type="text" scWidth="*"/>
+		<F Name="whl_wallet_type_id" Type="integer" scWidth="*"/>
+
+		<Link Name="all" Master="">
+			<List Way="All" OrderBy="code" />
+		</Link>
+		<Link Name="whl_wallet_type" Master="WhlWalletType">
+			<List Way="SimpleMaster" MasterField="whl_wallet_type_id.id" OrderBy="code" />
+		</Link>
+		<Link Name="whl" Master="WhiteLabel">
+			<List Way="Sql">FROM configuration.whl_wallet_type_params z WHERE z.whl_wallet_type_id IN (SELECT whl_wallet_type_id FROM configuration.whl_wallet_types where whl_id = :master_id) order by z.code, z.whl_wallet_type_id</List>
+		</Link>
+
+	</Entity>
+
+	<Entity Name="whl_category" Table="whl_categories" Class="WhlCategory">
+		<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+		<F Name="code" Type="text" scWidth="*"/>
+		<F Name="name" Type="text" scWidth="*"/>
+		<F Name="component_code" Type="text" scWidth="*"/>
+		<F Name="whl_category_id_parent" Type="integer" Null="1"/>
+		<F Name="whl_id" Type="smallint" scWidth="*"/>
+
+		<Link Name="whl" Master="WhiteLabel">
+			<List Way="SimpleMaster" MasterField="whl_id.id" OrderBy="code" />
+		</Link>
+	</Entity>
+
+	<Entity Table="whl_category_game">
+		<F Name="whl_category_id" Type="integer" PK="1"/>
+		<F Name="whl_account_id" Type="integer" PK="1" />
+	</Entity>
+
+	<Entity Table="whl_category_params" Name="whl_category_param" Class="WhlCategoryParam">
+		<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+		<F Name="code" Type="varchar(45)" Uniq1="1" scWidth="*"/>
+		<F Name="value" Type="text" scWidth="*" />
+		<F Name="whl_category_id" Type="integer" Uniq1="1" scWidth="*"/>
+		
+		<Link Name="whl_category" Master="WhlCategory">
+			<List Way="SimpleMaster" MasterField="whl_category_id.id" OrderBy="code" />
+		</Link>
+	</Entity>
+
+	<Entity Table="whl_category_lang_params" Name="whl_category_lang_param" Class="WhlCategoryLangParam">
+		<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+		<F Name="code" Type="text" Uniq1="1" scWidth="*"/>
+		<F Name="lang" Type="char(2)" Uniq1="1" scWidth="*"/>
+		<F Name="value" Type="text" scWidth="*"/>
+		<F Name="whl_category_id" Type="integer" Uniq1="1" scWidth="*"/>
+		<Link Name="whl_category" Master="WhlCategory">
+			<List Way="SimpleMaster" MasterField="whl_category_id.id" OrderBy="code, lang" />
+		</Link>
+	</Entity>
+
+	<Entity Name="auth_type" Table="auth_types" Class="AuthType">
+		<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+		<F Name="code" Type="text" Unique="1" scWidth="*"/>
+		<F Name="name" Type="text" scWidth="*"/>
+
+		<Link Name="all" Master="">	<List Way="All" OrderBy="name" /> </Link>
+		<Link Name="whl" Master="WhiteLabel">
+			<List Way="Sql">FROM configuration.auth_types z JOIN configuration.whl_auth_types sw ON sw.auth_type_id = z.auth_type_id WHERE sw.whl_id = :master_id ORDER BY z.name</List>
+		</Link>
+	</Entity>
+
+	<Entity Name="auth_type_param" Table="auth_type_params" Class="AuthTypeParam">
+		<F Name="id" Type="integer" AutoInc="1" scWidth="5%"/>
+		<F Name="code" Type="text" Uniq1="1" scWidth="*"/>
+		<F Name="value" Type="text" scWidth="*"/>
+		<F Name="auth_type_id" Type="integer" Uniq1="1" scWidth="*"/>
+
+		<Link Name="auth_type" Master="AuthType">
+			<List Way="SimpleMaster" MasterField="auth_type_id.id" OrderBy="code" />
+		</Link>
+	</Entity>
+
+	<Entity Table="whl_auth_types" >
+		<F Name="auth_type_id" Type="integer" PK="1" />
+		<F Name="whl_id" Type="smallint" PK="1" />
+	</Entity>
+</ROOT>

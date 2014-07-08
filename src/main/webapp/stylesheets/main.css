@@ -1,0 +1,83 @@
+html {
+    background: #eee;
+}
+
+header h1 {
+    padding: 0.4em 1.1em;
+    color: green;
+    font-weight: normal;
+    font-size: 24px;
+}
+
+/* bootstrap correction */
+.input-xxlarge {height: 2em;}
+/* bootstrap correction */
+
+/* goto menu*/
+.goto_menu, .goto_menu ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.goto_menu a {
+  display: block;
+  width: 14em;
+}
+
+.goto_menu li {
+  float: left;
+  width: 14em;
+}
+
+.goto_menu li ul {
+  position: absolute;
+  width: 14em;
+  left: -999em;
+}
+
+.goto_menu li:hover ul {
+  left: 5em;
+}
+
+/* goto menu
+.goto_menu li:hover ul {  left: auto;}
+*/
+
+
+h1 #master_info {
+	color: blue;	
+}
+
+div#main {
+    position: relative;
+    padding: 5em 2em;
+    border-bottom: 1px solid #ccc;
+    min-height: 600px;
+} 
+
+div#main .topRight {
+    position: absolute;
+    right: 20px;
+    top: 70px;
+}
+
+/*field simple*/
+th.id						{ width: 4%;    min-width: 10px;}
+th.is_active		{ width: 4%;    min-width: 10px;}
+th.is_valid			{ width: 4%;    min-width: 10px;} 
+th.client_code 	{ width: 5%;    min-width: 10px;}
+th.code					{ width: 10%;    min-width: 10px;}
+th.component_code      	{ width: 10%;    min-width: 10px;}
+th.currency_code 	     	{ width: 3%;    min-width: 10px;}
+th.integration_code			{ width: 10%;    min-width: 10px;}
+th.name					{ min-width: 10px;}
+/*field simple*/
+
+
+/*references*/
+th.casino_account_id		{ width: 15%;    min-width: 10px;}
+th.user_group_id		{ width: 15%;    min-width: 10px;}
+th.whl_account_id		{ width: 20%;    min-width: 10px;}
+th.whl_id		{ width: 15%;    min-width: 10px;}
+/*references*/

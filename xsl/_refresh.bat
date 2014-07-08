@@ -1,0 +1,1 @@
+copy D:\Dbase\Schema\EntityConfiguration.xml EntityConfiguration.xml
