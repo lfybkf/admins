@@ -123,7 +123,7 @@ exclude-result-prefixes="My msxsl">
 	<xsl:apply-templates select="F[@Name != 'id']" mode="map" />
 	}//function
 
-	//id =====================
+	//<editor-fold desc="Id region">
 	<!--entity has id ?-->
 	<xsl:if test="F[@Name='id']">
 	@Id
@@ -137,11 +137,11 @@ exclude-result-prefixes="My msxsl">
 	public Long getId() {return id;}
 	public void setId(Long aid) {id = aid;}
 	</xsl:if>
-	//id =====================
+	//</editor-fold>
 
-	//fields =====================
+	//<editor-fold desc="Id region">
 	<xsl:apply-templates select="F[@Name != 'id']" />
-	//fields =====================
+	//</editor-fold>
 
 }//class
 
