@@ -21,6 +21,7 @@ target/
 .idea/
 
 #other
+__*.*
 src/main/java/models/
 *.txt
 db*.properties

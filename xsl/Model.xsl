@@ -17,12 +17,6 @@ exclude-result-prefixes="My msxsl">
 <!--==========================================-->
 <xsl:template match="Entity" >
 	<xsl:variable name="Table" select="concat($Schema, '.', @Table)" />
-	<xsl:variable name="Key">
-		<xsl:choose>
-			<xsl:when test="F[@Name = 'id']">Long</xsl:when>
-			<xsl:otherwise><xsl:value-of select="concat(@Class, 'Key')"/></xsl:otherwise>
-		</xsl:choose>
-	</xsl:variable>
 	//Generated <xsl:value-of select="My:Now()" />
 	package models;
 
@@ -49,7 +43,7 @@ exclude-result-prefixes="My msxsl">
 	//public static final String ref = "<xsl:value-of select="concat(@Name, '_id')"/>";
 
 	//mapping database fields to entity parameters
-	public static Map&lt;String, String&gt; DbE = new HashMap&lt;String, String&gt;();
+		public static <![CDATA[ Map<String, String> DbE = new HashMap<>();]]>
 
 	static {
 	//fill DbE
@@ -109,6 +103,7 @@ exclude-result-prefixes="My msxsl">
 		return Ret;
 	}//method
 
+	//region Fill region
 	@Override
 	public void fillDefaults()
 	{
@@ -122,8 +117,9 @@ exclude-result-prefixes="My msxsl">
 	String value;
 	<xsl:apply-templates select="F[@Name != 'id']" mode="map" />
 	}//function
+	//endregion
 
-	//<editor-fold desc="Id region">
+	//region Id region
 	<!--entity has id ?-->
 	<xsl:if test="F[@Name='id']">
 	@Id
@@ -137,11 +133,11 @@ exclude-result-prefixes="My msxsl">
 	public Long getId() {return id;}
 	public void setId(Long aid) {id = aid;}
 	</xsl:if>
-	//</editor-fold>
+	//endregion
 
-	//<editor-fold desc="Id region">
+	//region Fields region
 	<xsl:apply-templates select="F[@Name != 'id']" />
-	//</editor-fold>
+	//endregion
 
 }//class
 
